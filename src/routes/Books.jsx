@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import useAxios from "../services/useAxios";
 import {
   Box,
   Card,
@@ -11,48 +11,42 @@ import {
   Rating,
   Chip,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
 function Books() {
-  const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, loading, get } = useAxios("http://localhost:3000");
 
   useEffect(() => {
-    if (books.length === 0) {
+    if (data.length === 0) {
       getBooks();
     }
   }, []);
 
   // TODO: Replace axios with useAxios hook
-  async function getBooks() {
-    try {
-      const response = await axios.get('http://localhost:3000/books');
-      setBooks(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
+  // Function to get all the books from server
+  function getBooks() {
+    get("books");
   }
 
   // TODO: Implement search functionality
   return (
-    <Box sx={{ mx: 'auto', p: 2 }}>
-      {isLoading && <CircularProgress />}
-      {!isLoading && (
+    <Box sx={{ mx: "auto", p: 2 }}>
+      {loading && <CircularProgress />}
+      {!loading && (
         <div>
           <Stack
-            sx={{ justifyContent: 'space-around' }}
+            sx={{ justifyContent: "space-around" }}
             spacing={{ xs: 1 }}
             direction="row"
             useFlexGap
             flexWrap="wrap"
           >
-            {books.map((book) => (
+            {data.map((book) => (
               <Card
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '15%',
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "15%",
                   minWidth: 200,
                 }}
                 key={book.name}
@@ -80,8 +74,8 @@ function Books() {
                 </Box>
                 <CardActions
                   sx={{
-                    justifyContent: 'space-between',
-                    mt: 'auto',
+                    justifyContent: "space-between",
+                    mt: "auto",
                     pl: 2,
                   }}
                 >
