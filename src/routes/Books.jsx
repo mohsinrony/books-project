@@ -46,7 +46,8 @@ function Books() {
     setFilteredBooks(data.filter(
       (book) =>
         book.name.toLowerCase().includes(event.target.value.toLowerCase()) ||
-        book.author.toLowerCase().includes(event.target.value.toLowerCase())
+        book.author.toLowerCase().includes(event.target.value.toLowerCase())||
+        book.genres.some(genre => genre.toLowerCase().includes(event.target.value.toLowerCase()))
     ));
 
   }
