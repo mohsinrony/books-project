@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import useAxios from "../services/useAxios";
 import {
   Box,
   Card,
@@ -11,49 +11,73 @@ import {
   Rating,
   Chip,
   Typography,
-} from '@mui/material';
+  TextField,
+} from "@mui/material";
 
 function Books() {
-  const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, loading, get } = useAxios("http://localhost:3000");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredBooks, setFilteredBooks] = useState([]);
 
   useEffect(() => {
-    if (books.length === 0) {
+    if (data.length === 0) {
       getBooks();
     }
   }, []);
 
-  // TODO: Replace axios with useAxios hook
-  // Function to get all the books from server
-  async function getBooks() {
-    try {
-      const response = await axios.get('http://localhost:3000/books');
-      setBooks(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
+
+  const booksToDisplay = searchTerm ? filteredBooks : data;
+
+  // Use the get function from useAxios instead of axios.get
+  function getBooks() {
+    get("books")
+      .then(response => {
+        console.log(response);
+        // Set filteredBooks after fetching data
+        setFilteredBooks(response.data);
+      })
+      .catch(error => console.error(error));
   }
 
-  // TODO: Implement search functionality
+  // Implement search functionality
+  function handleSearchInputChange(event) {
+    setSearchTerm(event.target.value);
+    // Update filteredBooks when the search term changes
+    setFilteredBooks(data.filter(
+      (book) =>
+        book.name.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        book.author.toLowerCase().includes(event.target.value.toLowerCase())
+    ));
+
+  }
+   
+
   return (
-    <Box sx={{ mx: 'auto', p: 2 }}>
-      {isLoading && <CircularProgress />}
-      {!isLoading && (
+    <Box sx={{ mx: "auto", p: 2 }}>
+      {loading && <CircularProgress />}
+      {!loading && (
         <div>
           <Stack
-            sx={{ justifyContent: 'space-around' }}
+            sx={{ justifyContent: "space-around" }}
             spacing={{ xs: 1 }}
             direction="row"
             useFlexGap
             flexWrap="wrap"
           >
-            {books.map((book) => (
+            <TextField
+            label="Search Books"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchInputChange}
+            sx={{ mb: 2 }}
+          />
+
+            {booksToDisplay.map((book) => (
               <Card
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '15%',
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "15%",
                   minWidth: 200,
                 }}
                 key={book.name}
@@ -81,8 +105,8 @@ function Books() {
                 </Box>
                 <CardActions
                   sx={{
-                    justifyContent: 'space-between',
-                    mt: 'auto',
+                    justifyContent: "space-between",
+                    mt: "auto",
                     pl: 2,
                   }}
                 >
@@ -104,3 +128,4 @@ function Books() {
 }
 
 export default Books;
+
