@@ -11,10 +11,13 @@ import {
   Rating,
   Chip,
   Typography,
+  TextField,
 } from "@mui/material";
 
 function Books() {
   const { data, loading, get } = useAxios("http://localhost:3000");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredBooks, setFilteredBooks] = useState([]);
 
   useEffect(() => {
     if (data.length === 0) {
@@ -22,13 +25,31 @@ function Books() {
     }
   }, []);
 
-  // TODO: Replace axios with useAxios hook
-  // Function to get all the books from server
+  const booksToDisplay = searchTerm ? filteredBooks : data;
+
+  // Use the get function from useAxios instead of axios.get
   function getBooks() {
-    get("books");
+    get("books")
+      .then(response => {
+        console.log(response);
+        // Set filteredBooks after fetching data
+        setFilteredBooks(response.data);
+      })
+      .catch(error => console.error(error));
   }
 
-  // TODO: Implement search functionality
+  // Implement search functionality
+  function handleSearchInputChange(event) {
+    setSearchTerm(event.target.value);
+    // Update filteredBooks when the search term changes
+    setFilteredBooks(data.filter(
+      (book) =>
+        book.name.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        book.author.toLowerCase().includes(event.target.value.toLowerCase())
+    ));
+  }
+   
+
   return (
     <Box sx={{ mx: "auto", p: 2 }}>
       {loading && <CircularProgress />}
@@ -41,7 +62,15 @@ function Books() {
             useFlexGap
             flexWrap="wrap"
           >
-            {data.map((book) => (
+            <TextField
+            label="Search Books"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchInputChange}
+            sx={{ mb: 2 }}
+          />
+
+            {booksToDisplay.map((book) => (
               <Card
                 sx={{
                   display: "flex",
@@ -97,3 +126,4 @@ function Books() {
 }
 
 export default Books;
+
