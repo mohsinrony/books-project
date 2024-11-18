@@ -25,6 +25,7 @@ function Books() {
     }
   }, []);
 
+
   const booksToDisplay = searchTerm ? filteredBooks : data;
 
   // Use the get function from useAxios instead of axios.get
@@ -47,6 +48,7 @@ function Books() {
         book.name.toLowerCase().includes(event.target.value.toLowerCase()) ||
         book.author.toLowerCase().includes(event.target.value.toLowerCase())
     ));
+
   }
    
 
